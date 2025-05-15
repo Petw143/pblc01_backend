@@ -1,0 +1,11 @@
+services:
+  db:
+    image: postgres:15.3
+    volumes:
+      - ./volumes/postgres/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: mypet
+      POSTGRES_USER: mypet
+      POSTGRES_DB: mypet
+    ports:
+      - "5432:5432"
