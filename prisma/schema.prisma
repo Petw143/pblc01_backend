@@ -1,10 +1,117 @@
 generator client {
-    provider = "prisma-client-js"
-    output = "../generated"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
+model User {
+  id          Int           @id @default(autoincrement())
+  name        String
+  email       String        @unique
+  password    String
+  role        Role          // 'CUSTOMER' ou 'BUSINESS'
+  createdAt   DateTime      @default(now())
+  pets        Pet[]
+  orders      Order[]
+  reviews     Review[]
+  business    Business?     // se for um estabelecimento, existe um Business
+}
+
+model Pet {
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Business {
+  id          Int           @id @default(autoincrement())
+  name        String
+  description String
+  address     String
+  phone       String
+  userId      Int           @unique
+  user        User          @relation(fields: [userId], references: [id])
+  products    Product[]
+  services    Service[]
+  reviews     Review[]
+  promotions  Promotion[]
+}
+
+model Product {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  businessId  Int
+  business    Business   @relation(fields: [businessId], references: [id])
+  orderItems  OrderItem[]
+}
+
+model Service {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  businessId  Int
+  business    Business   @relation(fields: [businessId], references: [id])
+  orderItems  OrderItem[]
+}
+
+model Order {
+  id         Int         @id @default(autoincrement())
+  userId     Int
+  user       User        @relation(fields: [userId], references: [id])
+  total      Float
+  status     OrderStatus
+  createdAt  DateTime    @default(now())
+  items      OrderItem[]
+}
+
+model OrderItem {
+  id         Int        @id @default(autoincrement())
+  orderId    Int
+  order      Order      @relation(fields: [orderId], references: [id])
+  productId  Int?       
+  product    Product?   @relation(fields: [productId], references: [id])
+  serviceId  Int?       
+  service    Service?   @relation(fields: [serviceId], references: [id])
+  quantity   Int
+  price      Float
+}
+
+model Review {
+  id         Int        @id @default(autoincrement())
+  userId     Int
+  businessId Int
+  rating     Int        // 1 a 5
+  comment    String
+  createdAt  DateTime   @default(now())
+  user       User       @relation(fields: [userId], references: [id])
+  business   Business   @relation(fields: [businessId], references: [id])
+}
+
+model Promotion {
+  id         Int        @id @default(autoincrement())
+  title      String
+  discount   Float      // percentual ex: 0.2 = 20%
+  expiresAt  DateTime
+  businessId Int
+  business   Business   @relation(fields: [businessId], references: [id])
+}
+
+enum Role {
+  CUSTOMER
+  BUSINESS
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+  DELIVERED
+}
