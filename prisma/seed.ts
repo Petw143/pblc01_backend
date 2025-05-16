@@ -1,112 +1,132 @@
-import { PrismaClient, Role, OrderStatus } from '@prisma/client';
-import argon2 from 'argon2'; 
+import { PrismaClient, TipoCartao } from '@prisma/client'; // Adicione TipoCartao
+import argon2 from 'argon2';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Iniciando o seed...')  
-  const senhaHash = await argon2.hash('hashedPassword');   
+  console.log('Iniciando o seed...');
+  const senhaHash = await argon2.hash('hashedPassword'); // Use senhaHash
 
-  // Criar usuário cliente
-  const userCustomer = await prisma.user.create({
+  // Usuário Cliente
+  const clienteUsuario = await prisma.usuario.create({
     data: {
-      name: 'João Cliente',
-      email: 'cliente@mypet.com',
-      password: senhaHash,
-      role: Role.CUSTOMER,
-    },
-  });
-
-  // Criar pet do cliente
-  const pet = await prisma.pet.create({
-    data: {
-      name: 'Rex',
-      type: 'Cachorro',
-      userId: userCustomer.id,
-    },
-  });
-
-  // Criar usuário estabelecimento
-  const userBusiness = await prisma.user.create({
-    data: {
-      name: 'PetShop Feliz',
-      email: 'petshop@mypet.com',
-      password: senhaHash,
-      role: Role.BUSINESS,
-    },
-  });
-
-  // Criar estabelecimento
-  const business = await prisma.business.create({
-    data: {
-      name: 'PetShop Feliz',
-      description: 'Banho, tosa e produtos para pets.',
-      address: 'Rua dos Pets, 123',
-      phone: '(35) 99999-9999',
-      userId: userBusiness.id,
-    },
-  });
-
-  // Criar produto
-  const product = await prisma.product.create({
-    data: {
-      name: 'Ração Premium 10kg',
-      description: 'Ração para cães adultos',
-      price: 129.90,
-      businessId: business.id,
-    },
-  });
-
-  // Criar serviço
-  const service = await prisma.service.create({
-    data: {
-      name: 'Banho e Tosa',
-      description: 'Serviço completo de banho e tosa',
-      price: 70.00,
-      businessId: business.id,
-    },
-  });
-
-  // Criar pedido
-  const order = await prisma.order.create({
-    data: {
-      userId: userCustomer.id,
-      total: 199.90,
-      status: OrderStatus.CONFIRMED,
-      items: {
+      nome: 'João Cliente',
+      email: 'cliente@example.com',
+      senha: senhaHash, // Corrigido
+      tipo: 'CLIENTE',
+      imagemPerfil: null,
+      cliente: {
+        create: {
+          cupons: {
+            create: [
+              {
+                nome: 'DESCONTO10',
+                dataValidade: new Date(Date.now() + 7 * 86400000),
+                desconto: 0.1,
+              },
+            ],
+          },
+        },
+      },
+      endereco: {
+        create: {
+          rua: 'Rua das Flores',
+          bairro: 'Centro',
+          cep: '12345-678',
+          numero: '123',
+          complemento: 'Apto 45',
+        },
+      },
+      cartoes: {
         create: [
           {
-            productId: product.id,
-            quantity: 1,
-            price: product.price,
-          },
-          {
-            serviceId: service.id,
-            quantity: 1,
-            price: service.price,
+            tipoCartao: TipoCartao.CREDITO,
+            numeroCartao: '4111111111111111',
+            cvc: 123,
+            nomeCartao: 'JOAO CLIENTE',
+            dataValidade: new Date('2026-12-01'),
           },
         ],
       },
     },
-  });
-
-  // Criar avaliação
-  const review = await prisma.review.create({
-    data: {
-      userId: userCustomer.id,
-      businessId: business.id,
-      rating: 5,
-      comment: 'Ótimo atendimento e serviço!',
+    include: {
+      cliente: true,
     },
   });
 
-  // Criar promoção
-  const promotion = await prisma.promotion.create({
+  const fornecedorUsuario = await prisma.usuario.create({
     data: {
-      title: '20% OFF em serviços',
-      discount: 0.2,
-      expiresAt: new Date(new Date().setDate(new Date().getDate() + 7)),
-      businessId: business.id,
+      nome: 'PetShop Legal',
+      email: 'fornecedor@example.com',
+      senha: senhaHash, // Corrigido
+      tipo: 'FORNECEDOR',
+      imagemPerfil: null,
+      fornecedor: {
+        create: {
+          avaliacaoTotal: 4.5,
+          dadosBancarios: {
+            create: {
+              idBanco: '001',
+              numAgencia: '1234',
+              tipoConta: 'Corrente',
+            },
+          },
+        },
+      },
+    },
+    include: {
+      fornecedor: true,
+    },
+  });
+
+  const fornecedorId = fornecedorUsuario.fornecedor?.id ?? 0;
+
+  const produto = await prisma.produto.create({ // ou prisma.product.create
+    data: {
+      nome: 'Ração Premium 10kg',
+      valor: 129.9,
+      quantidade: 10,
+      fornecedorId,
+    },
+  });
+
+  const servico = await prisma.servico.create({ // ou prisma.service.create
+    data: {
+      nome: 'Banho e Tosa',
+      valor: 60,
+      dataAgendada: new Date(),
+      fornecedorId,
+    },
+  });
+
+  await prisma.avaliacao.create({ // ou prisma.rating.create
+    data: {
+      nota: 5,
+      fornecedorId,
+    },
+  });
+
+  await prisma.carrinhoCompras.create({
+    data: {
+      clienteId: clienteUsuario.cliente?.id ?? 0,
+      items: {
+        create: [
+          {
+            nome: 'Ração Premium 10kg',
+            valor: 129.9,
+            produto: {
+              connect: { id: produto.id },
+            },
+          },
+          {
+            nome: 'Banho e Tosa',
+            valor: 60,
+            servico: {
+              connect: { id: servico.id },
+            },
+          },
+        ],
+      },
     },
   });
 
@@ -115,7 +135,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('Erro no seed:', e);
     process.exit(1);
   })
   .finally(async () => {
