@@ -1,8 +1,17 @@
-import { Router } from 'express';
-import { loginController } from '../controllers/auth.controller';
+import express from 'express';
+import { AuthController } from '../controllers/auth.controller'; // Ajuste o caminho se necessário
 
-const router = Router();
+const router = express.Router();
+const authController = new AuthController();
 
-router.post('/login', loginController);
+// Rota para registo de novo utilizador
+router.post('/register', authController.register);
+
+// Rota para login de utilizador
+router.post('/login', authController.login);
+
+// Rota para verificar a validade do JWT
+router.get('/verify', authController.verifyJWT);
+
 
 export default router;

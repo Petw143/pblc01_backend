@@ -1,7 +1,7 @@
-import { PrismaClient } from 'prisma';
+// import { PrismaClient } from 'prisma';
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
-export const findSerByNome = async (nome: string) => {
-    return prisma.ser.findUnique({ where: { nome } });
-};
+// export const findSerByNome = async (nome: string) => {
+//     return prisma.ser.findUnique({ where: { nome } });
+// };
