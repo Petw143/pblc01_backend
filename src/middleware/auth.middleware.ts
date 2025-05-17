@@ -65,8 +65,7 @@ import { Request, Response, NextFunction } from 'express';
 // Define interface AuthRequest extendendo Request com campo user tipado
 export interface AuthRequest extends Request {
   user?: {
-    userId: number; // ou string, conforme seu token
-    // adicione outros campos do token se precisar
+    userId: number; 
   };
 }
 
@@ -78,7 +77,6 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
   }
   const token = authHeader.split(' ')[1];
   try {
-    // Verifica e decodifica o token JWT
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as { userId: number };
     req.user = decoded; // atribui o objeto decodificado ao req.user
     next();

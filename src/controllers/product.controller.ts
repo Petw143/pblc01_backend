@@ -13,7 +13,7 @@ export class ProdutoController {
       res.json(produtos);
     } catch (error) {
       console.error(error);
-      next(error); // Passa o erro para o próximo middleware de erro
+      next(error); 
     }
   }
 
@@ -28,7 +28,7 @@ export class ProdutoController {
       res.json(produto);
     } catch (error) {
       console.error(error);
-      next(error); // Passa o erro para o próximo middleware de erro
+      next(error); 
     }
   }
 
@@ -40,19 +40,36 @@ export class ProdutoController {
         return;
       }
 
+      const fornecedorExiste = await prisma.fornecedor.findUnique({
+        where: { id: userId },
+      });
+
+      if (!fornecedorExiste) {
+        res.status(400).json({ message: 'Usuário não é um fornecedor válido. Para adicionar um prdouto no banco de dados é necessário ser um fornecedor.' });
+        return;
+      }
+
       const { nome, valor, quantidade } = req.body;
+
+      if (!nome || isNaN(Number(valor)) || isNaN(Number(quantidade))) {
+        res.status(400).json({ message: 'Dados inválidos. Verifique nome, valor, quantidade e id do fornecedor.' });
+        return;
+      }
+
       const novoProduto = await produtoRepo.create({
         nome,
         valor: Number(valor),
         quantidade: Number(quantidade),
-        fornecedorId: userId, // aqui é garantido que userId existe
+        fornecedorId: userId,
       });
+
       res.status(201).json(novoProduto);
     } catch (error) {
       console.error(error);
       next(error);
     }
   }
+
 
   async atualizarProduto(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -71,7 +88,6 @@ export class ProdutoController {
         return;
       }
 
-      // Verifica se o usuário autenticado é o fornecedor do produto
       if (produtoExistente.fornecedorId !== userId) {
         res.status(403).json({ message: 'Acesso negado. Você não é o fornecedor deste produto.' });
         return;

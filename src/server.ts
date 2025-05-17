@@ -3,7 +3,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import authRoutes from './routes/auth.route';
 import productRoutes from './routes/product.route';
-import { authMiddleware } from './middleware/auth.middleware';
+import itemRoutes from './routes/item.route';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,9 +16,9 @@ const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'E-commerce API',
+      title: 'MyPet API',
       version: '1.0.0',
-      description: 'API para um sistema de e-commerce',
+      description: 'API para gerenciamento de produtos e itens do MyPet',
     },
   },
   apis: ['./routes/*.ts', './src/schemas/*.ts'],
@@ -33,7 +33,9 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/auth', authRoutes);
 
 // Rotas protegidas com JWT
-app.use('/produto', authMiddleware, productRoutes);
+app.use('/produto', productRoutes);
+
+app.use('/item', itemRoutes);
 
 // Middleware de erro genérico
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

@@ -23,7 +23,16 @@ export class ProductRepository {
         quantidade: number;
         fornecedorId: number;
     }): Promise<Produto> {
-        return this.prisma.produto.create({ data });
+        const { fornecedorId, ...produtoData } = data;
+
+        return this.prisma.produto.create({
+            data: {
+                ...produtoData,
+                fornecedor: {
+                    connect: { id: fornecedorId },
+                },
+            },
+        });
     }
 
     async update(id: number, data: {

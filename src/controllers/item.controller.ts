@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ItemRepository } from '../repositories/item.repository'; // Importe o ItemRepository
+import { ItemRepository } from '../repositories/item.repository'; 
 import { PrismaClient, Item } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -8,7 +8,7 @@ const itemRepository = new ItemRepository(prisma);
 export class ItemController {
   async createItem(req: Request, res: Response): Promise<void> {
     try {
-      const itemData: Omit<Item, 'id'> = req.body; // Pega os dados do corpo da requisição
+      const itemData: Omit<Item, 'id'> = req.body; 
       const newItem = await itemRepository.create(itemData);
       res.status(201).json(newItem);
     } catch (error) {

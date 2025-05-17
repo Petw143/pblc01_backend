@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { hash, verify } from 'argon2'; // Importa do argon2
+import { hash, verify } from 'argon2';
 import jwt from 'jsonwebtoken';
 import { config } from 'dotenv';
 
-config(); // Carrega as variáveis de ambiente do arquivo .env
+config();
 
 const prisma = new PrismaClient();
 
@@ -42,18 +42,20 @@ export class AuthController {
         },
       });
 
+      const tipoUpper = tipo.toUpperCase();
+
       // Cria um perfil de cliente ou fornecedor com base no tipo
-      if (tipo === 'CLIENTE') {
+      if (tipoUpper === 'CLIENTE') {
         await prisma.cliente.create({
           data: {
             id: newUser.id, // Usa o ID do usuário como ID do cliente
           },
         });
-      } else if (tipo === 'FORNECEDOR') {
+      } else if (tipoUpper === 'FORNECEDOR') {
         await prisma.fornecedor.create({
           data: {
-            id: newUser.id, // Usa o ID do usuário como ID do fornecedor
-            avaliacaoTotal: 0, // Valor inicial
+            id: newUser.id, 
+            avaliacaoTotal: 0, 
           },
         });
       }
@@ -95,7 +97,7 @@ export class AuthController {
   }
 
     async verifyJWT(req: Request, res: Response): Promise<void> {
-        const token = req.headers.authorization?.split(' ')[1]; // Pega o token do header
+        const token = req.headers.authorization?.split(' ')[1]; 
 
         if (!token) {
             res.status(401).json({ message: 'Token não fornecido' });

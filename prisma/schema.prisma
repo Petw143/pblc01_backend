@@ -28,7 +28,7 @@ model Usuario {
   senha        String
   imagemPerfil String?
   tipo         String // 'CLIENTE' ou 'FORNECEDOR'
-  endereco     Endereco?
+  endereco     Endereco?  
   cartoes      Cartao[]
   cliente      Cliente?
   fornecedor   Fornecedor?

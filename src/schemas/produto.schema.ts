@@ -39,6 +39,8 @@
  *     security:
  *       - bearerAuth: []
  * 
+ * 
+ * 
  * /produto/{id}:
  *   get:
  *     summary: Retorna um produto pelo ID
@@ -125,6 +127,7 @@
  *         - nome
  *         - valor
  *         - quantidade
+ *         - fornecedorId
  *       properties:
  *         nome:
  *           type: string
@@ -137,6 +140,9 @@
  *           type: number
  *           format: float
  *           example: 100
+ *         fornecedorId:
+ *           type: integer
+ *           example: 1
  * 
  *     Produto:
  *       type: object

@@ -2,11 +2,10 @@
  * @openapi
  * openapi: 3.0.0
  * info:
- *   title: API de Autenticação
+ *   title: API de Autenticação do MyPet
  *   version: 1.0.0
  * tags:
  *   - name: Autenticação
- *     description: Endpoints relacionados à autenticação (login, registro, verificação de token)
  *
  * paths:
  *   /auth/login:
@@ -57,7 +56,7 @@
  *         '500':
  *           description: Erro interno ao processar o registro
  *
- *   /auth/verify-jwt:
+ *   /auth/verify:
  *     get:
  *       tags:
  *         - Autenticação
@@ -126,7 +125,7 @@
  *           enum:
  *             - CLIENTE
  *             - FORNECEDOR
- *           example: "CLIENTE"
+ *           example: "FORNECEDOR"
  *
  *     UserResponse:
  *       type: object
@@ -147,5 +146,6 @@
  *           enum:
  *             - CLIENTE
  *             - FORNECEDOR
+ *           description: Pode ser 'CLIENTE' ou 'FORNECEDOR'
  *           example: "CLIENTE"
  */

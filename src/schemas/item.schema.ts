@@ -1,6 +1,7 @@
 /**
  * @openapi
- * /items:
+ * 
+ * /item:
  *   get:
  *     summary: Retorna todos os itens
  *     tags:
@@ -9,13 +10,15 @@
  *       '200':
  *         description: Lista de itens
  *         content:
- *           application/json:
+ *            application/json: 
  *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Item'
  *       '500':
  *         description: Erro interno do servidor
+ *     security:
+ *       - bearerAuth: []
  * 
  *   post:
  *     summary: Cria um novo item
@@ -43,7 +46,8 @@
  *     security:
  *       - bearerAuth: []
  * 
- * /items/{id}:
+ * 
+ * /item/{id}:
  *   get:
  *     summary: Retorna um item pelo ID
  *     tags:
@@ -66,6 +70,8 @@
  *         description: Item não encontrado
  *       '500':
  *         description: Erro interno do servidor
+ *     security:
+ *       - bearerAuth: []
  * 
  *   put:
  *     summary: Atualiza um item pelo ID
@@ -130,33 +136,34 @@
  *     ItemInput:
  *       type: object
  *       required:
- *         - name
- *         - price
+ *         - nome
+ *         - valor
+ *         - carrinhoId
  *       properties:
- *         name:
+ *         nome:
  *           type: string
- *           example: "Item Exemplo"
- *         description:
- *           type: string
- *           example: "Descrição do item"
- *         price:
+ *           example: 'Item Exemplo'
+ *         valor:
  *           type: number
  *           format: float
  *           example: 19.99
+ *         carrinhoId:
+ *           type: integer
+ *           example: 1
  * 
  *     ItemInputPartial:
  *       type: object
  *       properties:
- *         name:
+ *         nome:
  *           type: string
- *           example: "Item Exemplo"
- *         description:
- *           type: string
- *           example: "Descrição do item"
- *         price:
+ *           example: 'Item Exemplo'
+ *         valor:
  *           type: number
  *           format: float
  *           example: 19.99
+ *         carrinhoId:
+ *           type: integer
+ *           example: 1
  * 
  *     Item:
  *       type: object
@@ -164,16 +171,16 @@
  *         id:
  *           type: integer
  *           example: 1
- *         name:
+ *         nome:
  *           type: string
- *           example: "Item Exemplo"
- *         description:
- *           type: string
- *           example: "Descrição do item"
- *         price:
+ *           example: 'Item Exemplo'
+ *         valor:
  *           type: number
  *           format: float
  *           example: 19.99
+ *         carrinhoId:
+ *           type: integer
+ *           example: 1
  * 
  *   securitySchemes:
  *     bearerAuth:

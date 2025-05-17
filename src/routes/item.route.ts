@@ -6,11 +6,11 @@ const router = Router();
 const itemController = new ItemController();
 
 // Rotas públicas
-router.get('/', (req: Request, res: Response, next: NextFunction) => {
+router.get('/', authMiddleware, (req: Request, res: Response, next: NextFunction) => {
   itemController.getAllItems(req, res).catch(next);
 });
 
-router.get('/:id', (req: Request, res: Response, next: NextFunction) => {
+router.get('/:id', authMiddleware, (req: Request, res: Response, next: NextFunction) => {
   itemController.getItemById(req, res).catch(next);
 });
 
